@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Table(name = "models")
 public class Model {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "model_gen")

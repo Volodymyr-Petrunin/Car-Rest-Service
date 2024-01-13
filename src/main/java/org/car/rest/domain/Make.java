@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Table(name = "makes")
 public class Make {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "make_gen")

@@ -12,6 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "cars")
 public class Car {
     @Id
     @Column(name = "object_id", nullable = false)
@@ -23,7 +24,7 @@ public class Car {
     private Model model;
 
     @ElementCollection(targetClass = Category.class)
-    @CollectionTable(name = "car_categories", joinColumns = @JoinColumn(name = "car_id"))
+    @CollectionTable(name = "cars_categories", joinColumns = @JoinColumn(name = "car_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
     private Set<Category> categories;
