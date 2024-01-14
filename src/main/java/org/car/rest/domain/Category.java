@@ -1,6 +1,9 @@
 package org.car.rest.domain;
 
 
+import lombok.Getter;
+
+@Getter
 public enum Category {
     SUV("SUV"),
     SEDAN("Sedan"),
@@ -17,9 +20,5 @@ public enum Category {
 
     Category(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 }
