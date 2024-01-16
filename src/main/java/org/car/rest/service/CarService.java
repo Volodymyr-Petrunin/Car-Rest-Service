@@ -3,6 +3,7 @@ package org.car.rest.service;
 import jakarta.transaction.Transactional;
 import org.car.rest.domain.Car;
 import org.car.rest.domain.Make;
+import org.car.rest.domain.Model;
 import org.car.rest.repository.CarRepository;
 import org.car.rest.repository.MakeRepository;
 import org.car.rest.repository.ModelRepository;
@@ -45,6 +46,7 @@ public class CarService {
         saveChildren(cars, makeRepository, car -> car.getModel().getMake());
         setMakeInModel(cars);
         saveChildren(cars, modelRepository, Car::getModel);
+        setModelInCar(cars);
 
         repository.saveAll(cars);
     }
@@ -67,6 +69,15 @@ public class CarService {
         for (Make make : makers) {
             List<Car> carWithMake = cars.stream().filter(car -> car.getModel().getMake().getName().equals(make.getName())).toList();
             carWithMake.forEach(car -> car.getModel().setMake(make));
+        }
+    }
+
+    private void setModelInCar(Set<Car> cars){
+        List<Model> models = modelRepository.findAll();
+
+        for (Model model : models) {
+            List<Car> carWithModel = cars.stream().filter(car -> car.getModel().getName().equals(model.getName())).toList();
+            carWithModel.forEach(car -> car.setModel(model));
         }
     }
 }
