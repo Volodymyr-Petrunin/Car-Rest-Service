@@ -1,4 +1,4 @@
-package org.car.rest.repositories;
+package org.car.rest.repository;
 
 import org.car.rest.domain.Car;
 import org.springframework.data.jpa.repository.JpaRepository;

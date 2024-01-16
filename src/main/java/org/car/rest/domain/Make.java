@@ -17,4 +17,20 @@ public class Make {
     @Column(name = "make_model")
     private String name;
 
+    public Make() {
+
+    }
+
+    public Make(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "Make{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

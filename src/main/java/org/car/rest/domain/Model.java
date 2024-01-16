@@ -3,6 +3,8 @@ package org.car.rest.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 @Getter
 @Setter
@@ -17,5 +19,24 @@ public class Model {
     @Column(name = "model_name")
     private String name;
     @OneToOne
+    @Cascade(CascadeType.PERSIST)
     private Make make;
+
+    public Model() {
+
+    }
+
+    public Model(Long id, String name, Make make) {
+        this.id = id;
+        this.name = name;
+        this.make = make;
+    }
+
+    @Override
+    public String toString() {
+        return "Model{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

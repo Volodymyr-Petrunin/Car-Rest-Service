@@ -3,8 +3,10 @@ package org.car.rest.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.CascadeType;
 
 import java.time.Year;
 import java.util.Set;
@@ -21,11 +23,32 @@ public class Car {
     @JdbcTypeCode(SqlTypes.SMALLINT)
     private Year year;
     @OneToOne
+    @Cascade(CascadeType.PERSIST)
     private Model model;
 
+    @Cascade(CascadeType.PERSIST)
     @ElementCollection(targetClass = Category.class)
     @CollectionTable(name = "cars_categories", joinColumns = @JoinColumn(name = "car_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
     private Set<Category> categories;
+
+    public Car() {
+
+    }
+
+    public Car(String objectId, Year year, Model model, Set<Category> categories) {
+        this.objectId = objectId;
+        this.year = year;
+        this.model = model;
+        this.categories = categories;
+    }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "objectId='" + objectId + '\'' +
+                ", year=" + year +
+                '}';
+    }
 }

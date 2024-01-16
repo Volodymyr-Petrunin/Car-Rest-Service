@@ -2,7 +2,7 @@ package org.car.rest.service;
 
 import jakarta.transaction.Transactional;
 import org.car.rest.domain.Model;
-import org.car.rest.repositories.ModelRepository;
+import org.car.rest.repository.ModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
