@@ -6,6 +6,8 @@ import org.car.rest.service.CarService;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.util.stream.Collectors;
+
 
 @Component
 @Profile("fill-data")
@@ -21,6 +23,6 @@ public class CarFiller implements DataFiller {
     @PostConstruct
     @Override
     public void fill() {
-        carService.createSeveralCars(carParser.parse().toList());
+        carService.createSeveralCars(carParser.parse().collect(Collectors.toSet()));
     }
 }

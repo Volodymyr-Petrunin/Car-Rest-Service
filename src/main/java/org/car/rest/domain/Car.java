@@ -26,7 +26,6 @@ public class Car {
     @Cascade(CascadeType.PERSIST)
     private Model model;
 
-    @Cascade(CascadeType.PERSIST)
     @ElementCollection(targetClass = Category.class)
     @CollectionTable(name = "cars_categories", joinColumns = @JoinColumn(name = "car_id"))
     @Enumerated(EnumType.STRING)

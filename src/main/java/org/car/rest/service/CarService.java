@@ -2,20 +2,30 @@ package org.car.rest.service;
 
 import jakarta.transaction.Transactional;
 import org.car.rest.domain.Car;
+import org.car.rest.domain.Make;
 import org.car.rest.repository.CarRepository;
+import org.car.rest.repository.MakeRepository;
+import org.car.rest.repository.ModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
 
 @Service
 @Transactional
 public class CarService {
     private final CarRepository repository;
+    private final MakeRepository makeRepository;
+    private final ModelRepository modelRepository;
 
     @Autowired
-    public CarService(CarRepository repository) {
+    public CarService(CarRepository repository, MakeRepository makeRepository, ModelRepository modelRepository) {
         this.repository = repository;
+        this.makeRepository = makeRepository;
+        this.modelRepository = modelRepository;
     }
 
     public List<Car> getAllCars() {
@@ -31,7 +41,11 @@ public class CarService {
         repository.save(car);
     }
 
-    public void createSeveralCars(List<Car> cars) {
+    public void createSeveralCars(Set<Car> cars) {
+        saveChildren(cars, makeRepository, car -> car.getModel().getMake());
+        setMakeInModel(cars);
+        saveChildren(cars, modelRepository, Car::getModel);
+
         repository.saveAll(cars);
     }
 
@@ -41,5 +55,18 @@ public class CarService {
 
     public void deleteCarById(String id) {
         repository.deleteById(id);
+    }
+
+    private <T> void saveChildren(Set<Car> cars, JpaRepository<T, Long> repo, Function<Car, T> function) {
+        repo.saveAll(cars.stream().map(function).distinct().toList());
+    }
+
+    private void setMakeInModel(Set<Car> cars){
+        List<Make> makers = makeRepository.findAll();
+
+        for (Make make : makers) {
+            List<Car> carWithMake = cars.stream().filter(car -> car.getModel().getMake().getName().equals(make.getName())).toList();
+            carWithMake.forEach(car -> car.getModel().setMake(make));
+        }
     }
 }
