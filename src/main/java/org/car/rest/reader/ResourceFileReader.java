@@ -17,13 +17,15 @@ public class ResourceFileReader implements org.car.rest.reader.Reader {
         this.fileName = fileName;
     }
 
-    public List<String[]> read() throws IOException, CsvException {
+    public List<String[]> read() throws IOException{
         InputStream inputStream = getClass().getResourceAsStream("/" + fileName);
 
         assert inputStream != null;
         try (Reader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
             try (CSVReader csvReader = new CSVReader(reader)) {
                 return csvReader.readAll();
+            } catch (CsvException e) {
+                throw new IOException("Something wrong with ResourceFileReader!", e);
             }
         }
     }
