@@ -16,7 +16,7 @@ public class Make {
     @SequenceGenerator(name = "make_gen", sequenceName = "make_seq")
     @Column(name = "make_id", nullable = false)
     private Long id;
-    @Column(name = "make_model")
+    @Column(name = "make_name")
     private String name;
 
     public Make() {

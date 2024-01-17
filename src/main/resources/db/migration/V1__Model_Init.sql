@@ -19,7 +19,7 @@ CREATE TABLE cars_categories
 CREATE TABLE makes
 (
     make_id    BIGINT NOT NULL,
-    make_model VARCHAR(255),
+    make_name VARCHAR(255),
     CONSTRAINT pk_make PRIMARY KEY (make_id)
 );
 
