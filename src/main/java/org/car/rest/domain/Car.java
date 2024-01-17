@@ -3,10 +3,8 @@ package org.car.rest.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import org.hibernate.annotations.CascadeType;
 
 import java.time.Year;
 import java.util.Set;
@@ -23,7 +21,6 @@ public class Car {
     @JdbcTypeCode(SqlTypes.SMALLINT)
     private Year year;
     @OneToOne
-    @Cascade(CascadeType.PERSIST)
     private Model model;
 
     @ElementCollection(targetClass = Category.class)

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 @Transactional
 public class MakeService {
@@ -23,17 +24,18 @@ public class MakeService {
         this.makeMapper = makeMapper;
     }
 
-    public List<Make> getAllMaker() {
-        return repository.findAll(Sort.by(Sort.Direction.ASC, "id"));
+    public List<MakeDto> getAllMaker() {
+        return repository.findAll(Sort.by(Sort.Direction.ASC, "id"))
+                .stream().map(makeMapper::makeToMakeDto).toList();
     }
 
-    public List<MakeDto> getAllMakesAsDto() {
-        return this.getAllMaker().stream().map(makeMapper::makeToMakeDto).toList();
+    public MakeDto getMakerById(Long id) {
+        return makeMapper.makeToMakeDto(repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Can't find maker by id: " + id)));
     }
 
-    public Make getMakerById(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Can't find maker by id: " + id));
+    public MakeDto getMakerByName(String name){
+        return makeMapper.makeToMakeDto(repository.findByName(name));
     }
 
     public void createMaker(Make make) {
@@ -42,6 +44,10 @@ public class MakeService {
 
     public void createSeveralMaker(List<Make> makes) {
         repository.saveAll(makes);
+    }
+
+    public MakeDto updateMaker(MakeDto makeDto){
+        return makeMapper.makeToMakeDto(repository.save(makeMapper.makeDtoToMake(makeDto)));
     }
 
     public void deleteMakerById(Long id) {

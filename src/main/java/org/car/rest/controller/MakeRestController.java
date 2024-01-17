@@ -3,9 +3,7 @@ package org.car.rest.controller;
 import org.car.rest.domain.dto.MakeDto;
 import org.car.rest.service.MakeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,7 +20,26 @@ public class MakeRestController {
 
     @GetMapping("/all")
     public List<MakeDto> allMake(){
-        return makeService.getAllMakesAsDto();
+        return makeService.getAllMaker();
     }
 
+    @GetMapping("/show/id/{id}")
+    public MakeDto showMakerById(@PathVariable long id){
+        return makeService.getMakerById(id);
+    }
+
+    @GetMapping("/show/name/{name}")
+    public MakeDto showMakerByName(@PathVariable String name){
+        return makeService.getMakerByName(name);
+    }
+
+    @PatchMapping("/update/{id}/{name}")
+    public MakeDto updateMakerName(@ModelAttribute MakeDto makeDto){
+        return makeService.updateMaker(makeDto);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteMaker(@PathVariable long id){
+        makeService.deleteMakerById(id);
+    }
 }
