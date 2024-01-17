@@ -42,4 +42,8 @@ public class MakeRestController {
     public void deleteMaker(@PathVariable long id){
         makeService.deleteMakerById(id);
     }
+    @PutMapping("/create/maker/{name}")
+    public MakeDto createMaker(@ModelAttribute MakeDto makeDto){
+       return makeService.createMaker(makeDto);
+    }
 }

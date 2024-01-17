@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -38,12 +39,12 @@ public class MakeService {
         return makeMapper.makeToMakeDto(repository.findByName(name));
     }
 
-    public void createMaker(Make make) {
-        repository.save(make);
+    public MakeDto createMaker(MakeDto makeDto) {
+       return makeMapper.makeToMakeDto(repository.save(makeMapper.makeDtoToMake(makeDto)));
     }
 
-    public void createSeveralMaker(List<Make> makes) {
-        repository.saveAll(makes);
+    public void createSeveralMaker(List<MakeDto> makes) {
+        repository.saveAll(makes.stream().map(makeMapper::makeDtoToMake).toList());
     }
 
     public MakeDto updateMaker(MakeDto makeDto){
