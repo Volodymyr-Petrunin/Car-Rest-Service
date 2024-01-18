@@ -4,17 +4,26 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import org.car.rest.domain.Car;
 import org.car.rest.mapper.CarMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Stream;
 
+@Component
+@PropertySource("classpath:fill-configuration.properties")
+@Profile("fill-data")
 public class CarParser implements Parser<Car> {
     private final String fileName;
     private final CarMapper carMapper;
 
-    public CarParser(String fileName, CarMapper carMapper) {
+    @Autowired
+    public CarParser(@Value("${filename}") String fileName, CarMapper carMapper) {
         this.fileName = fileName;
         this.carMapper = carMapper;
     }
