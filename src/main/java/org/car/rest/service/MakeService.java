@@ -6,11 +6,11 @@ import org.car.rest.domain.dto.MakeDto;
 import org.car.rest.domain.mapper.MakeMapper;
 import org.car.rest.repository.MakeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -35,8 +35,11 @@ public class MakeService {
                 .orElseThrow(() -> new IllegalArgumentException("Can't find maker by id: " + id)));
     }
 
-    public MakeDto getMakerByName(String name){
-        return makeMapper.makeToMakeDto(repository.findByName(name));
+    public MakeDto getMakerByExample(MakeDto makeDto){
+        Example<Make> example = Example.of(makeMapper.makeDtoToMake(makeDto));
+
+        return makeMapper.makeToMakeDto(repository.findOne(example)
+                .orElseThrow(() -> new IllegalArgumentException("Can't find maker")));
     }
 
     public MakeDto createMaker(MakeDto makeDto) {
@@ -47,8 +50,12 @@ public class MakeService {
         repository.saveAll(makes.stream().map(makeMapper::makeDtoToMake).toList());
     }
 
-    public MakeDto updateMaker(MakeDto makeDto){
-        return makeMapper.makeToMakeDto(repository.save(makeMapper.makeDtoToMake(makeDto)));
+    public MakeDto updateMaker(MakeDto makeDto) {
+        if (repository.findById(makeDto.getId()).isPresent()) {
+            return makeMapper.makeToMakeDto(repository.save(makeMapper.makeDtoToMake(makeDto)));
+        } else {
+            throw new IllegalArgumentException("No make for update with id: " + makeDto.getId());
+        }
     }
 
     public void deleteMakerById(Long id) {

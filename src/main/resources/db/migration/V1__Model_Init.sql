@@ -32,10 +32,10 @@ CREATE TABLE models
 );
 
 ALTER TABLE cars
-    ADD CONSTRAINT FK_CAR_ON_MODEL_MODEL FOREIGN KEY (model_model_id) REFERENCES models (model_id);
+    ADD CONSTRAINT FK_CAR_ON_MODEL_MODEL FOREIGN KEY (model_model_id) REFERENCES models (model_id) ON DELETE CASCADE;
 
 ALTER TABLE models
-    ADD CONSTRAINT FK_MODEL_ON_MAKE_MAKE FOREIGN KEY (make_make_id) REFERENCES makes (make_id);
+    ADD CONSTRAINT FK_MODEL_ON_MAKE_MAKE FOREIGN KEY (make_make_id) REFERENCES makes (make_id) ON DELETE CASCADE;
 
 ALTER TABLE cars_categories
-    ADD CONSTRAINT fk_car_categories_on_car FOREIGN KEY (car_id) REFERENCES cars (object_id);
+    ADD CONSTRAINT fk_car_categories_on_car FOREIGN KEY (car_id) REFERENCES cars (object_id) ON DELETE CASCADE;

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/maker")
+@RequestMapping("/api/v1/make")
 public class MakeRestController {
 
     private final MakeService makeService;
@@ -23,27 +23,28 @@ public class MakeRestController {
         return makeService.getAllMaker();
     }
 
-    @GetMapping("/show/id/{id}")
+    @GetMapping("/{id}")
     public MakeDto showMakerById(@PathVariable long id){
         return makeService.getMakerById(id);
     }
 
-    @GetMapping("/show/name/{name}")
-    public MakeDto showMakerByName(@PathVariable String name){
-        return makeService.getMakerByName(name);
+    @GetMapping("/search")
+    public MakeDto showMakerByName(@RequestBody MakeDto makeDto){
+        return makeService.getMakerByExample(makeDto);
     }
 
-    @PatchMapping("/update/{id}/{name}")
-    public MakeDto updateMakerName(@ModelAttribute MakeDto makeDto){
+    @PatchMapping("/")
+    public MakeDto updateMakerName(@RequestBody MakeDto makeDto){
         return makeService.updateMaker(makeDto);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public void deleteMaker(@PathVariable long id){
-        makeService.deleteMakerById(id);
+    @DeleteMapping("/")
+    public void deleteMaker(@RequestBody MakeDto makeDto){
+        makeService.deleteMakerById(makeDto.getId());
     }
-    @PutMapping("/create/maker/{name}")
-    public MakeDto createMaker(@ModelAttribute MakeDto makeDto){
+
+    @PostMapping("/")
+    public MakeDto createMaker(@RequestBody MakeDto makeDto){
        return makeService.createMaker(makeDto);
     }
 }
