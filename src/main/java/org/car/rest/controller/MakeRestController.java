@@ -24,12 +24,12 @@ public class MakeRestController {
     }
 
     @GetMapping("/{id}")
-    public MakeDto showMakerById(@PathVariable long id){
+    public MakeDto getMakerById(@PathVariable long id){
         return makeService.getMakerById(id);
     }
 
     @GetMapping("/search")
-    public MakeDto showMakerByName(@RequestBody MakeDto makeDto){
+    public MakeDto searchMaker(@RequestBody MakeDto makeDto){
         return makeService.getMakerByExample(makeDto);
     }
 
