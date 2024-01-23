@@ -2,12 +2,19 @@ package org.car.rest.service;
 
 import jakarta.transaction.Transactional;
 import org.car.rest.domain.Car;
+import org.car.rest.domain.Category;
 import org.car.rest.domain.Make;
 import org.car.rest.domain.Model;
+import org.car.rest.domain.dto.CarDto;
+import org.car.rest.domain.dto.ModelDto;
+import org.car.rest.domain.mapper.CarMapper;
+import org.car.rest.domain.mapper.ModelMapper;
 import org.car.rest.repository.CarRepository;
 import org.car.rest.repository.MakeRepository;
 import org.car.rest.repository.ModelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
@@ -23,25 +30,40 @@ public class CarService {
     private final CarRepository repository;
     private final MakeRepository makeRepository;
     private final ModelRepository modelRepository;
+    private final CarMapper carMapper;
+    private final ModelService modelService;
+    private final ModelMapper modelMapper;
 
     @Autowired
-    public CarService(CarRepository repository, MakeRepository makeRepository, ModelRepository modelRepository) {
+    public CarService(CarRepository repository, MakeRepository makeRepository, ModelRepository modelRepository,
+                      CarMapper carMapper, ModelService modelService,
+                      ModelMapper modelMapper) {
         this.repository = repository;
         this.makeRepository = makeRepository;
         this.modelRepository = modelRepository;
+        this.carMapper = carMapper;
+        this.modelService = modelService;
+        this.modelMapper = modelMapper;
     }
 
-    public List<Car> getAllCars() {
-        return repository.findAll();
+    public List<CarDto> getAllCars() {
+        return repository.findAll().stream().map(carMapper::carToCarDto).toList();
     }
 
-    public Car getCarById(String id) {
-        return repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Can't find car with id: " + id));
+    public CarDto getCarById(String id) {
+        return carMapper.carToCarDto(repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Can't find car with id: " + id)));
     }
 
-    public void createCar(Car car) {
-        repository.save(car);
+    public List<CarDto> getCarByExample(CarDto carDto) {
+        Example<Car> example = Example.of(carMapper.carDtoToCar(carDto));
+
+        return repository.findAll(example).stream()
+                .map(carMapper::carToCarDto).toList();
+    }
+
+    public CarDto createCar(CarDto carDto) {
+        return carMapper.carToCarDto(repository.save(carMapper.carDtoToCar(carDto)));
     }
 
     public void createSeveralCars(Set<Car> cars) {
@@ -54,12 +76,12 @@ public class CarService {
         repository.saveAll(cars);
     }
 
-    public void updateCar(Car car){
-        repository.save(car);
+    public CarDto updateCar(CarDto carDto){
+        return carMapper.carToCarDto(repository.save(carMapper.carDtoToCar(carDto)));
     }
 
-    public void deleteCarById(String id) {
-        repository.deleteById(id);
+    public void deleteCarById(CarDto carDto) {
+        repository.deleteById(carDto.getObjectId());
     }
 
     private <T> void saveChildren(Set<Car> cars, JpaRepository<T, Long> repo, Function<Car, T> function) {
