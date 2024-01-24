@@ -29,7 +29,7 @@ public class CarRestController {
 
     @GetMapping("/search")
     public List<CarDto> findCars(@RequestBody CarDto carDto){
-        return carService.getCarByExample(carDto);
+        return carService.getCarBySpecifications(carDto);
     }
 
     @PatchMapping("/")

@@ -5,7 +5,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.car.rest.domain.Category;
 
-import java.time.Year;
 import java.util.Set;
 
 @Getter
