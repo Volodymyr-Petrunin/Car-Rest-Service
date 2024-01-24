@@ -15,12 +15,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -106,28 +104,15 @@ public class CarService {
     private Specification<Car> buildQuery(CarDto carDto){
         Car car = carMapper.carDtoToCar(carDto);
 
-        Specification<Car> specification = Specification.where(null);
-
-        if (car.getObjectId() != null) {
-            specification = specification.and(CarSpecifications.carWithSameObjectId(car.getObjectId()));
-        }
-
-        if (car.getYear() != null) {
-            specification = specification.and(CarSpecifications.carWithSameYear(car.getYear()));
-        }
-
-        if (car.getModel() != null) {
-            specification = specification.and(CarSpecifications.carWithSameModel(car.getModel()));
-        }
-
-        if (car.getCategories() != null) {
-            specification = specification.and(CarSpecifications.carWithSameCategories(car.getCategories()));
-        }
-
-        if (carDto.getMakeName() != null){
-            specification = specification.and(CarSpecifications.carWithSameMaker(makeRepository.findByName(carDto.getMakeName())));
-        }
-
-        return specification;
+        return Stream.of(
+                        CarSpecifications.hasObjectId(car.getObjectId()),
+                        CarSpecifications.hasYear(car.getYear()),
+                        CarSpecifications.hasModel(car.getModel()),
+                        CarSpecifications.hasCategories(car.getCategories()),
+                        CarSpecifications.hasMaker(makeRepository.findByName(carDto.getMakeName()))
+                )
+                .flatMap(Optional::stream)
+                .reduce(Specification::and)
+                .orElse(Specification.where(null));
     }
 }

@@ -8,6 +8,7 @@ import org.car.rest.domain.Model;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Year;
+import java.util.Optional;
 import java.util.Set;
 
 public abstract class CarSpecifications {
@@ -16,31 +17,51 @@ public abstract class CarSpecifications {
         throw new IllegalStateException("Specifications class");
     }
 
-    public static Specification<Car> carWithSameObjectId(String objectId){
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("objectId"), objectId);
+    public static Optional<Specification<Car>> hasObjectId(String objectId){
+        if (objectId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("objectId"), objectId));
     }
 
-    public static Specification<Car> carWithSameYear(Year year){
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("year"), year);
+    public static Optional<Specification<Car>> hasYear(Year year){
+        if (year == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("year"), year));
     }
 
-    public static Specification<Car> carWithSameModel(Model model){
-        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("model"), model);
+    public static Optional<Specification<Car>> hasModel(Model model){
+        if (model == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("model"), model));
     }
 
-    public static Specification<Car> carWithSameCategories(Set<Category> categories){
-        return (root, criteriaQuery, criteriaBuilder) -> {
+    public static Optional<Specification<Car>> hasCategories(Set<Category> categories){
+        if (categories == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of((root, criteriaQuery, criteriaBuilder) -> {
             Join<Car, Set<Category>> categoriesJoin = root.join("categories");
             return categoriesJoin.in(categories);
-        };
+        });
     }
 
-    public static Specification<Car> carWithSameMaker(Make make){
-        return (root, query, criteriaBuilder) -> {
+    public static Optional<Specification<Car>> hasMaker(Make make){
+        if (make == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of((root, query, criteriaBuilder) -> {
             Join<Car, Model> modelJoin = root.join("model");
             Join<Model, Make> makeJoin = modelJoin.join("make");
 
             return criteriaBuilder.equal(makeJoin.get("id"), make.getId());
-        };
+        });
     }
 }
