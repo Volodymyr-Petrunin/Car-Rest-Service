@@ -122,28 +122,31 @@ class CarRestControllerTest {
         String objectId = "golf";
         requestCarDto.setYear((short) 1995);
 
-        when(carService.updateCar(objectId, requestCarDto)).thenReturn(any());
+        ResponseCarDto responseCarDto = expectedResponseDto.get(0);
+        responseCarDto.setObjectId(objectId);
+        responseCarDto.setYear((short) 1995);
 
-        mockMvc.perform(patch(requestMapping + "/")
+        when(carService.updateCar(objectId, requestCarDto)).thenReturn(responseCarDto);
+
+        mockMvc.perform(patch(requestMapping + "/" + objectId)
+                        .param("objectId", objectId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapToJson(requestCarDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapToJson(requestCarDto)));
+                .andExpect(content().json(mapToJson(responseCarDto)));
 
         verify(carService, times(1)).updateCar(objectId, requestCarDto);
     }
 
     @Test
     void testDeleteCar_ShouldReturnNoContent() throws Exception {
-        ResponseCarDto responseCarDto = expectedResponseDto.get(0);
+        String objectId = "abc";
 
-        mockMvc.perform(delete(requestMapping  + "/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapToJson(responseCarDto)))
+        mockMvc.perform(delete(requestMapping  + "/" + objectId))
                 .andExpect(status().isOk());
 
-        verify(carService, times(1)).deleteCarById(responseCarDto.getObjectId());
+        verify(carService, times(1)).deleteCarById(objectId);
     }
 
     @Test
@@ -151,14 +154,18 @@ class CarRestControllerTest {
         RequestCarDto requestCarDto = new RequestCarDto();
         requestCarDto.setYear((short) 2022);
 
-        when(carService.createCar(requestCarDto)).thenReturn(any());
+        ResponseCarDto responseCarDto = new ResponseCarDto();
+        responseCarDto.setObjectId("any");
+        requestCarDto.setYear((short) 2022);
+
+        when(carService.createCar(requestCarDto)).thenReturn(responseCarDto);
 
         mockMvc.perform(post(requestMapping + "/")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapToJson(requestCarDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapToJson(requestCarDto)));
+                .andExpect(content().json(mapToJson(responseCarDto)));
 
         verify(carService, times(1)).createCar(requestCarDto);
     }

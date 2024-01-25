@@ -23,9 +23,9 @@ public class CarRestController {
         return carService.getAllCars();
     }
 
-    @GetMapping("/{id}")
-    public ResponseCarDto getCarById(@PathVariable String id){
-        return carService.getCarById(id);
+    @GetMapping("/{objectId}")
+    public ResponseCarDto getCarById(@PathVariable String objectId){
+        return carService.getCarById(objectId);
     }
 
     @GetMapping("/search")
