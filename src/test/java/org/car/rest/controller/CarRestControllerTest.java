@@ -4,7 +4,8 @@ import org.car.rest.domain.Car;
 import org.car.rest.domain.Category;
 import org.car.rest.domain.Make;
 import org.car.rest.domain.Model;
-import org.car.rest.domain.dto.CarDto;
+import org.car.rest.domain.dto.RequestCarDto;
+import org.car.rest.domain.dto.ResponseCarDto;
 import org.car.rest.service.CarService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -43,56 +44,49 @@ class CarRestControllerTest {
                     new Model(null, "R172", new Make(null, "Mercedes-Benz")), Set.of(Category.SPORT, Category.CONVERTIBLE))
     );
 
-    private final static List<CarDto> expectedDto = new ArrayList<>();
+    private static List<ResponseCarDto> expectedResponseDto = new ArrayList<>();
+    private static List<RequestCarDto> expectedRequestDto = new ArrayList<>();
 
     private final String requestMapping = "/api/v1/car";
 
     @BeforeAll
     public static void setUp() {
-        for (Car car : expectedCars){
-            CarDto carDto = new CarDto();
-            carDto.setObjectId(car.getObjectId());
-            carDto.setYear(carDto.getYear());
-            carDto.setModelName(car.getModel().getName());
-            carDto.setMakeName(car.getModel().getMake().getName());
-            carDto.setCategories(car.getCategories());
-
-            expectedDto.add(carDto);
-        }
+        expectedResponseDto = setUpResponseCarDto();
+        expectedRequestDto = setUpRequestCarDto();
     }
 
     @Test
     void testFindAll_ShouldReturnCorrectList_AndCallGetAllCarsMethod() throws Exception {
-        when(carService.getAllCars()).thenReturn(expectedDto);
+        when(carService.getAllCars()).thenReturn(expectedResponseDto);
 
         mockMvc.perform(get(requestMapping + "/all"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapToJson(expectedDto)));
+                .andExpect(content().json(mapToJson(expectedResponseDto)));
 
         verify(carService, times(1)).getAllCars();
     }
 
     @Test
     void testFindByObjectId_ShouldReturnCorrectObject_AndCallGetCarByIdMethod() throws Exception {
-        String objectId = expectedDto.get(0).getObjectId();
-        when(carService.getCarById(objectId)).thenReturn(expectedDto.get(0));
+        String objectId = expectedResponseDto.get(0).getObjectId();
+        when(carService.getCarById(objectId)).thenReturn(expectedResponseDto.get(0));
 
         mockMvc.perform(get(requestMapping + "/" + objectId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapToJson(expectedDto.get(0))));
+                .andExpect(content().json(mapToJson(expectedResponseDto.get(0))));
 
         verify(carService, times(1)).getCarById(objectId);
     }
 
     @Test
     void testSearch_ShouldFindCorrectCarByYear_AndCallCorrectMethods() throws Exception {
-        CarDto newDto = new CarDto();
+        ResponseCarDto newDto = new ResponseCarDto();
         newDto.setYear((short) 2020);
-        when(carService.getCarBySpecifications(newDto)).thenReturn(List.of(expectedDto.get(1)));
+        when(carService.getCarBySpecifications(newDto)).thenReturn(List.of(expectedResponseDto.get(1)));
 
         mockMvc.perform(get(requestMapping + "/search")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -100,16 +94,16 @@ class CarRestControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapToJson(List.of(expectedDto.get(1)))));
+                .andExpect(content().json(mapToJson(List.of(expectedResponseDto.get(1)))));
 
         verify(carService, times(1)).getCarBySpecifications(newDto);
     }
 
     @Test
     void testSearch_ShouldFindCorrectCarByCategories_AndCallCorrectMethods() throws Exception {
-        CarDto newDto = new CarDto();
+        ResponseCarDto newDto = new ResponseCarDto();
         newDto.setCategories(Set.of(Category.SPORT));
-        when(carService.getCarBySpecifications(newDto)).thenReturn(List.of(expectedDto.get(2)));
+        when(carService.getCarBySpecifications(newDto)).thenReturn(List.of(expectedResponseDto.get(2)));
 
         mockMvc.perform(get(requestMapping + "/search")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,55 +111,83 @@ class CarRestControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapToJson(List.of(expectedDto.get(2)))));
+                .andExpect(content().json(mapToJson(List.of(expectedResponseDto.get(2)))));
 
         verify(carService, times(1)).getCarBySpecifications(newDto);
     }
 
     @Test
     void testUpdateCar_ShouldReturnUpdatedCar() throws Exception {
-        CarDto carDto = expectedDto.get(0);
-        carDto.setObjectId("golf");
-        carDto.setYear((short) 1995);
-        when(carService.updateCar(carDto)).thenReturn(carDto);
+        RequestCarDto requestCarDto = expectedRequestDto.get(0);
+        String objectId = "golf";
+        requestCarDto.setYear((short) 1995);
+
+        when(carService.updateCar(objectId, requestCarDto)).thenReturn(any());
 
         mockMvc.perform(patch(requestMapping + "/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapToJson(carDto)))
+                        .content(mapToJson(requestCarDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapToJson(carDto)));
+                .andExpect(content().json(mapToJson(requestCarDto)));
 
-        verify(carService, times(1)).updateCar(carDto);
+        verify(carService, times(1)).updateCar(objectId, requestCarDto);
     }
 
     @Test
     void testDeleteCar_ShouldReturnNoContent() throws Exception {
-        CarDto carDto = expectedDto.get(0);
+        ResponseCarDto responseCarDto = expectedResponseDto.get(0);
 
         mockMvc.perform(delete(requestMapping  + "/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapToJson(carDto)))
+                        .content(mapToJson(responseCarDto)))
                 .andExpect(status().isOk());
 
-        verify(carService, times(1)).deleteCarById(carDto);
+        verify(carService, times(1)).deleteCarById(responseCarDto.getObjectId());
     }
 
     @Test
     void testCreateCar_ShouldReturnCreatedCar() throws Exception {
-        CarDto carDto = new CarDto();
-        carDto.setYear((short) 2022);
+        RequestCarDto requestCarDto = new RequestCarDto();
+        requestCarDto.setYear((short) 2022);
 
-        when(carService.createCar(carDto)).thenReturn(carDto);
+        when(carService.createCar(requestCarDto)).thenReturn(any());
 
-        mockMvc.perform(put(requestMapping + "/")
+        mockMvc.perform(post(requestMapping + "/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapToJson(carDto)))
+                        .content(mapToJson(requestCarDto)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(mapToJson(carDto)));
+                .andExpect(content().json(mapToJson(requestCarDto)));
 
-        verify(carService, times(1)).createCar(carDto);
+        verify(carService, times(1)).createCar(requestCarDto);
+    }
+
+    private static List<ResponseCarDto> setUpResponseCarDto(){
+        return expectedCars.stream()
+                .map(car -> {
+                    ResponseCarDto responseCarDto = new ResponseCarDto();
+                    responseCarDto.setObjectId(car.getObjectId());
+                    responseCarDto.setYear((short) car.getYear().getValue());
+                    responseCarDto.setModelName(car.getModel().getName());
+                    responseCarDto.setMakeName(car.getModel().getMake().getName());
+                    responseCarDto.setCategories(car.getCategories());
+
+                    return responseCarDto;
+                }).toList();
+    }
+
+    private static List<RequestCarDto> setUpRequestCarDto(){
+        return expectedCars.stream()
+                .map(car -> {
+                    RequestCarDto requestCarDto = new RequestCarDto();
+                    requestCarDto.setYear((short) car.getYear().getValue());
+                    requestCarDto.setModelName(car.getModel().getName());
+                    requestCarDto.setMakeName(car.getModel().getMake().getName());
+                    requestCarDto.setCategories(car.getCategories());
+
+                    return requestCarDto;
+                }).toList();
     }
 
     private String mapToJson(Object object) throws JsonProcessingException {

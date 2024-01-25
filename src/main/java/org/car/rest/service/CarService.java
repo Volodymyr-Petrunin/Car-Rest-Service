@@ -4,8 +4,10 @@ import jakarta.transaction.Transactional;
 import org.car.rest.domain.Car;
 import org.car.rest.domain.Make;
 import org.car.rest.domain.Model;
-import org.car.rest.domain.dto.CarDto;
+import org.car.rest.domain.dto.RequestCarDto;
+import org.car.rest.domain.dto.ResponseCarDto;
 import org.car.rest.domain.mapper.CarMapper;
+import org.car.rest.genaration.ObjectIdGeneration;
 import org.car.rest.repository.CarRepository;
 import org.car.rest.repository.MakeRepository;
 import org.car.rest.repository.ModelRepository;
@@ -27,27 +29,29 @@ public class CarService {
     private final MakeRepository makeRepository;
     private final ModelRepository modelRepository;
     private final CarMapper carMapper;
+    private final ObjectIdGeneration objectIdGeneration;
 
     @Autowired
     public CarService(CarRepository repository, MakeRepository makeRepository, ModelRepository modelRepository,
-                      CarMapper carMapper) {
+                      CarMapper carMapper, ObjectIdGeneration objectIdGeneration) {
         this.repository = repository;
         this.makeRepository = makeRepository;
         this.modelRepository = modelRepository;
         this.carMapper = carMapper;
+        this.objectIdGeneration = objectIdGeneration;
     }
 
-    public List<CarDto> getAllCars() {
+    public List<ResponseCarDto> getAllCars() {
         return repository.findAll().stream().map(carMapper::carToCarDto).toList();
     }
 
-    public CarDto getCarById(String id) {
+    public ResponseCarDto getCarById(String id) {
         return carMapper.carToCarDto(repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Can't find car with id: " + id)));
     }
 
-    public List<CarDto> getCarBySpecifications(CarDto carDto) {
-        Specification<Car> specification = buildQuery(carDto);
+    public List<ResponseCarDto> getCarBySpecifications(ResponseCarDto responseCarDto) {
+        Specification<Car> specification = buildQuery(responseCarDto);
 
         if (specification.equals(Specification.where(null))) {
             return Collections.emptyList();
@@ -57,8 +61,11 @@ public class CarService {
                 .map(carMapper::carToCarDto).toList();
     }
 
-    public CarDto createCar(CarDto carDto) {
-        return carMapper.carToCarDto(repository.save(carMapper.carDtoToCar(carDto)));
+    public ResponseCarDto createCar(RequestCarDto requestCarDto) {
+        Car car = carMapper.requestCarDtoToCar(requestCarDto);
+        car.setObjectId(objectIdGeneration.generateRandomChars());
+
+        return carMapper.carToCarDto(repository.save(car));
     }
 
     public void createSeveralCars(Set<Car> cars) {
@@ -71,12 +78,15 @@ public class CarService {
         repository.saveAll(cars);
     }
 
-    public CarDto updateCar(CarDto carDto){
-        return carMapper.carToCarDto(repository.save(carMapper.carDtoToCar(carDto)));
+    public ResponseCarDto updateCar(String objectId, RequestCarDto requestCarDto){
+        Car car = carMapper.requestCarDtoToCar(requestCarDto);
+        car.setObjectId(objectId);
+
+        return carMapper.carToCarDto(repository.save(car));
     }
 
-    public void deleteCarById(CarDto carDto) {
-        repository.deleteById(carDto.getObjectId());
+    public void deleteCarById(String objectId) {
+        repository.deleteById(objectId);
     }
 
     private <T> void saveChildren(Set<Car> cars, JpaRepository<T, Long> repo, Function<Car, T> function) {
@@ -101,15 +111,15 @@ public class CarService {
         cars.forEach(car -> car.setModel(modelMap.get(car.getModel().getName())));
     }
 
-    private Specification<Car> buildQuery(CarDto carDto){
-        Car car = carMapper.carDtoToCar(carDto);
+    private Specification<Car> buildQuery(ResponseCarDto responseCarDto){
+        Car car = carMapper.carDtoToCar(responseCarDto);
 
         return Stream.of(
                         CarSpecifications.hasObjectId(car.getObjectId()),
                         CarSpecifications.hasYear(car.getYear()),
                         CarSpecifications.hasModel(car.getModel()),
                         CarSpecifications.hasCategories(car.getCategories()),
-                        CarSpecifications.hasMaker(makeRepository.findByName(carDto.getMakeName()))
+                        CarSpecifications.hasMaker(makeRepository.findByName(responseCarDto.getMakeName()))
                 )
                 .flatMap(Optional::stream)
                 .reduce(Specification::and)

@@ -1,6 +1,7 @@
 package org.car.rest.controller;
 
-import org.car.rest.domain.dto.CarDto;
+import org.car.rest.domain.dto.RequestCarDto;
+import org.car.rest.domain.dto.ResponseCarDto;
 import org.car.rest.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,33 +19,32 @@ public class CarRestController {
     }
 
     @GetMapping("/all")
-    public List<CarDto> getAllCars(){
+    public List<ResponseCarDto> getAllCars(){
         return carService.getAllCars();
     }
 
     @GetMapping("/{id}")
-    public CarDto getCarById(@PathVariable String id){
+    public ResponseCarDto getCarById(@PathVariable String id){
         return carService.getCarById(id);
     }
 
     @GetMapping("/search")
-    public List<CarDto> findCars(@RequestBody CarDto carDto){
-        return carService.getCarBySpecifications(carDto);
+    public List<ResponseCarDto> findCars(@RequestBody ResponseCarDto responseCarDto){
+        return carService.getCarBySpecifications(responseCarDto);
     }
 
-    @PatchMapping("/")
-    public CarDto updateCar(@RequestBody CarDto carDto){
-        return carService.updateCar(carDto);
+    @PatchMapping("/{objectId}")
+    public ResponseCarDto updateCar(@PathVariable String objectId, @RequestBody RequestCarDto requestCarDto){
+        return carService.updateCar(objectId, requestCarDto);
     }
 
-    @DeleteMapping("/")
-    public void deleteCar(@RequestBody CarDto carDto){
-        carService.deleteCarById(carDto);
+    @DeleteMapping("/{objectId}")
+    public void deleteCar(@PathVariable String objectId){
+        carService.deleteCarById(objectId);
     }
 
-    @PutMapping("/")
-    public CarDto createCar(@RequestBody CarDto carDto){
-        return carService.createCar(carDto);
+    @PostMapping("/")
+    public ResponseCarDto createCar(@RequestBody RequestCarDto requestCarDto){
+        return carService.createCar(requestCarDto);
     }
-
 }

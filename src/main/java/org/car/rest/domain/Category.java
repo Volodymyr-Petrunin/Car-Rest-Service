@@ -29,7 +29,10 @@ public enum Category {
     private static final Map<String, Category> LABEL_TO_CATEGORY = Arrays.stream(values())
             .collect(Collectors.toMap(Category::getName, Function.identity()));
 
-    public static Category valueOfLabel(String label){
+    public static Category valueOfLabel(String label) {
+        if (label == null || label.isEmpty()) {
+            throw new IllegalArgumentException("Category label is null or empty.");
+        }
         return LABEL_TO_CATEGORY.get(label.trim());
     }
 }

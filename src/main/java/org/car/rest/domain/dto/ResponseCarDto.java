@@ -12,7 +12,7 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode
-public class CarDto {
+public class ResponseCarDto {
     private String objectId;
     private short year;
     private String modelName;

@@ -11,11 +11,7 @@ import java.time.Year;
 import java.util.Optional;
 import java.util.Set;
 
-public abstract class CarSpecifications {
-
-    private CarSpecifications() {
-        throw new IllegalStateException("Specifications class");
-    }
+public final class CarSpecifications {
 
     public static Optional<Specification<Car>> hasObjectId(String objectId){
         if (objectId == null) {

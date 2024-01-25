@@ -3,7 +3,9 @@ package org.car.rest.parser;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import org.car.rest.domain.Car;
-import org.car.rest.mapper.CarMapper;
+import org.car.rest.domain.Category;
+import org.car.rest.domain.Make;
+import org.car.rest.domain.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -12,7 +14,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.time.Year;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Component
@@ -20,19 +26,17 @@ import java.util.stream.Stream;
 @Profile("fill-data")
 public class CarParser implements Parser<Car> {
     private final String fileName;
-    private final CarMapper carMapper;
 
     @Autowired
-    public CarParser(@Value("${filename}") String fileName, CarMapper carMapper) {
+    public CarParser(@Value("${filename}") String fileName) {
         this.fileName = fileName;
-        this.carMapper = carMapper;
     }
 
     @Override
     public Stream<Car> parse() {
         return getCsvData().stream()
                 .skip(1) // start with second element because firs is header
-                .map(carMapper::mapToObject);
+                .map(CarParser::mapToObject);
     }
 
     private List<String[]> getCsvData() {
@@ -52,5 +56,37 @@ public class CarParser implements Parser<Car> {
         } catch (CsvException e) {
             throw new IOException("Something wrong with cvsReader!", e);
         }
+    }
+
+    private static Car mapToObject(String[] data) {
+        Car car = new Car();
+        car.setObjectId(data[0]);
+        car.setModel(new Model(null, data[3], new Make(null, data[1])));
+
+        if (data[2].isEmpty()){
+            car.setYear(Year.of(0));
+        } else {
+            car.setYear(Year.parse(data[2]));
+        }
+
+        car.setCategories(parseCategories(data[4]));
+
+        return car;
+    }
+
+    private static Set<Category> parseCategories(String categoriesAsString) {
+        if (categoriesAsString.isEmpty()){
+            return Collections.emptySet();
+        }
+
+        String[] categoriesArray = categoriesAsString.split(",");
+
+        Set<Category> categories = new HashSet<>();
+
+        for (String label : categoriesArray){
+            categories.add(Category.valueOfLabel(label));
+        }
+
+        return categories;
     }
 }

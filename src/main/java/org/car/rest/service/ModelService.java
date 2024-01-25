@@ -42,7 +42,13 @@ public class ModelService {
     }
 
     public ModelDto createModel(ModelDto modelDto) {
-       return modelMapper.modelToModelDto(repository.save(modelMapper.modelDtoToModel(modelDto)));
+        Model newModel = modelMapper.modelDtoToModel(modelDto);
+
+        if (repository.existsByNameAndMake(newModel.getName(), newModel.getMake())){
+            throw new IllegalArgumentException("This model already exist: " + newModel);
+        }
+
+        return modelMapper.modelToModelDto(repository.save(newModel));
     }
 
     public void createSeveralModels(List<ModelDto> modelsDto) {

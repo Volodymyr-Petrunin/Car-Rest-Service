@@ -43,7 +43,13 @@ public class MakeService {
     }
 
     public MakeDto createMaker(MakeDto makeDto) {
-       return makeMapper.makeToMakeDto(repository.save(makeMapper.makeDtoToMake(makeDto)));
+        Make make = makeMapper.makeDtoToMake(makeDto);
+
+        if (repository.existsByName(make.getName())){
+            throw new IllegalArgumentException("This make already exist: " + make);
+        }
+
+        return makeMapper.makeToMakeDto(repository.save(make));
     }
 
     public void createSeveralMaker(List<MakeDto> makes) {
