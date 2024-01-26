@@ -2,12 +2,16 @@ package org.car.rest.service;
 
 import jakarta.transaction.Transactional;
 import org.car.rest.domain.Make;
-import org.car.rest.domain.dto.MakeDto;
+import org.car.rest.domain.dto.ResponseMakeDto;
+import org.car.rest.domain.dto.RequestMakeDto;
 import org.car.rest.domain.mapper.MakeMapper;
 import org.car.rest.repository.MakeRepository;
+import org.car.rest.service.exception.MakeServiceException;
+import org.car.rest.service.response.error.Code;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,42 +29,49 @@ public class MakeService {
         this.makeMapper = makeMapper;
     }
 
-    public List<MakeDto> getAllMaker() {
+    public List<ResponseMakeDto> getAllMaker() {
         return repository.findAll(Sort.by(Sort.Direction.ASC, "id"))
                 .stream().map(makeMapper::makeToMakeDto).toList();
     }
 
-    public MakeDto getMakerById(Long id) {
+    public ResponseMakeDto getMakerById(Long id) {
         return makeMapper.makeToMakeDto(repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Can't find maker by id: " + id)));
+                .orElseThrow(() -> new MakeServiceException(Code.REQUEST_VALIDATION_ERROR,
+                        "No make for with id: " + id, "Can't find make by id.", HttpStatus.BAD_REQUEST)));
     }
 
-    public MakeDto getMakerByExample(MakeDto makeDto){
-        Example<Make> example = Example.of(makeMapper.makeDtoToMake(makeDto));
+    public ResponseMakeDto getMakerByExample(RequestMakeDto requestMakeDto){
+        Example<Make> example = Example.of(makeMapper.requestMakeDtoToMake(requestMakeDto));
 
         return makeMapper.makeToMakeDto(repository.findOne(example)
-                .orElseThrow(() -> new IllegalArgumentException("Can't find maker")));
+                .orElseThrow(() -> new MakeServiceException(Code.REQUEST_VALIDATION_ERROR,
+                        "Can't find make.", "Can't find make by example.", HttpStatus.BAD_REQUEST)));
     }
 
-    public MakeDto createMaker(MakeDto makeDto) {
-        Make make = makeMapper.makeDtoToMake(makeDto);
+    public ResponseMakeDto createMaker(RequestMakeDto requestMakeDto) {
+        Make make = makeMapper.requestMakeDtoToMake(requestMakeDto);
 
         if (repository.existsByName(make.getName())){
-            throw new IllegalArgumentException("This make already exist: " + make);
+            throw new MakeServiceException(Code.REQUEST_VALIDATION_ERROR,
+                    "This maker already exist: " + make.getName(), "Make already exist.", HttpStatus.CONFLICT);
         }
 
         return makeMapper.makeToMakeDto(repository.save(make));
     }
 
-    public void createSeveralMaker(List<MakeDto> makes) {
-        repository.saveAll(makes.stream().map(makeMapper::makeDtoToMake).toList());
+    public void createSeveralMaker(List<RequestMakeDto> makes) {
+        repository.saveAll(makes.stream().map(makeMapper::requestMakeDtoToMake).toList());
     }
 
-    public MakeDto updateMaker(MakeDto makeDto) {
-        if (repository.findById(makeDto.getId()).isPresent()) {
-            return makeMapper.makeToMakeDto(repository.save(makeMapper.makeDtoToMake(makeDto)));
+    public ResponseMakeDto updateMaker(long id, RequestMakeDto requestMakeDto) {
+        if (repository.findById(id).isPresent()) {
+            Make make = makeMapper.requestMakeDtoToMake(requestMakeDto);
+            make.setId(id);
+
+            return makeMapper.makeToMakeDto(repository.save(make));
         } else {
-            throw new IllegalArgumentException("No make for update with id: " + makeDto.getId());
+            throw new MakeServiceException(Code.REQUEST_VALIDATION_ERROR,
+                    "No make for update with id: " + id, "Can't find make.", HttpStatus.BAD_REQUEST);
         }
     }
 

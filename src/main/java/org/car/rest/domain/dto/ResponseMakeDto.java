@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class MakeDto {
+public class ResponseMakeDto {
     private Long id;
     private String name;
 }
