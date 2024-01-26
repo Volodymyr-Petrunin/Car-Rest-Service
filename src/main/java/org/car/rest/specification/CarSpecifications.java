@@ -13,14 +13,6 @@ import java.util.Set;
 
 public final class CarSpecifications {
 
-    public static Optional<Specification<Car>> hasObjectId(String objectId){
-        if (objectId == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("objectId"), objectId));
-    }
-
     public static Optional<Specification<Car>> hasYear(Year year){
         if (year == null) {
             return Optional.empty();

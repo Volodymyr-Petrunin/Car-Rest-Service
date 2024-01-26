@@ -11,10 +11,13 @@ import org.car.rest.genaration.ObjectIdGeneration;
 import org.car.rest.repository.CarRepository;
 import org.car.rest.repository.MakeRepository;
 import org.car.rest.repository.ModelRepository;
+import org.car.rest.service.exception.CarServiceException;
+import org.car.rest.service.response.error.Code;
 import org.car.rest.specification.CarSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -60,6 +63,11 @@ public class CarService {
     public ResponseCarDto createCar(RequestCarDto requestCarDto) {
         Car car = carMapper.requestCarDtoToCar(requestCarDto);
         car.setObjectId(objectIdGeneration.generateRandomChars());
+
+        if (hasNullFields(car)) {
+            throw new CarServiceException(Code.REQUEST_VALIDATION_ERROR,
+                    "Sorry but your create request is shit:)", "You can't create a Car with null values in fields.", HttpStatus.BAD_REQUEST);
+        }
 
         return carMapper.carToResponseCarDto(repository.save(car));
     }
@@ -119,5 +127,12 @@ public class CarService {
                 .flatMap(Optional::stream)
                 .reduce(Specification::and)
                 .orElse(Specification.where(null));
+    }
+
+    private boolean hasNullFields(Car car){
+        return car.getYear() == null ||
+                car.getModel() == null ||
+                car.getCategories() == null ||
+                car.getCategories().isEmpty();
     }
 }
