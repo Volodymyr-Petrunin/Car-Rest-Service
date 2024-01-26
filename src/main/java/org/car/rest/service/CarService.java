@@ -42,30 +42,26 @@ public class CarService {
     }
 
     public List<ResponseCarDto> getAllCars() {
-        return repository.findAll().stream().map(carMapper::carToCarDto).toList();
+        return repository.findAll().stream().map(carMapper::carToResponseCarDto).toList();
     }
 
     public ResponseCarDto getCarById(String id) {
-        return carMapper.carToCarDto(repository.findById(id)
+        return carMapper.carToResponseCarDto(repository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Can't find car with id: " + id)));
     }
 
-    public List<ResponseCarDto> getCarBySpecifications(ResponseCarDto responseCarDto) {
-        Specification<Car> specification = buildQuery(responseCarDto);
-
-        if (specification.equals(Specification.where(null))) {
-            return Collections.emptyList();
-        }
+    public List<ResponseCarDto> getCarBySpecifications(RequestCarDto requestCarDto) {
+        Specification<Car> specification = buildQuery(requestCarDto);
 
         return repository.findAll(specification).stream()
-                .map(carMapper::carToCarDto).toList();
+                .map(carMapper::carToResponseCarDto).toList();
     }
 
     public ResponseCarDto createCar(RequestCarDto requestCarDto) {
         Car car = carMapper.requestCarDtoToCar(requestCarDto);
         car.setObjectId(objectIdGeneration.generateRandomChars());
 
-        return carMapper.carToCarDto(repository.save(car));
+        return carMapper.carToResponseCarDto(repository.save(car));
     }
 
     public void createSeveralCars(Set<Car> cars) {
@@ -82,7 +78,7 @@ public class CarService {
         Car car = carMapper.requestCarDtoToCar(requestCarDto);
         car.setObjectId(objectId);
 
-        return carMapper.carToCarDto(repository.save(car));
+        return carMapper.carToResponseCarDto(repository.save(car));
     }
 
     public void deleteCarById(String objectId) {
@@ -111,15 +107,14 @@ public class CarService {
         cars.forEach(car -> car.setModel(modelMap.get(car.getModel().getName())));
     }
 
-    private Specification<Car> buildQuery(ResponseCarDto responseCarDto){
-        Car car = carMapper.carDtoToCar(responseCarDto);
+    private Specification<Car> buildQuery(RequestCarDto requestCarDto){
+        Car car = carMapper.requestCarDtoToCar(requestCarDto);
 
         return Stream.of(
-                        CarSpecifications.hasObjectId(car.getObjectId()),
                         CarSpecifications.hasYear(car.getYear()),
                         CarSpecifications.hasModel(car.getModel()),
                         CarSpecifications.hasCategories(car.getCategories()),
-                        CarSpecifications.hasMaker(makeRepository.findByName(responseCarDto.getMakeName()))
+                        CarSpecifications.hasMaker(makeRepository.findByName(requestCarDto.getMakeName()))
                 )
                 .flatMap(Optional::stream)
                 .reduce(Specification::and)

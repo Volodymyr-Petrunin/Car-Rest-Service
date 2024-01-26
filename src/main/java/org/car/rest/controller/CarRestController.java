@@ -18,19 +18,14 @@ public class CarRestController {
         this.carService = carService;
     }
 
-    @GetMapping("/all")
-    public List<ResponseCarDto> getAllCars(){
-        return carService.getAllCars();
+    @GetMapping("/")
+    public List<ResponseCarDto> findCars(@RequestBody RequestCarDto requestCarDto){
+        return carService.getCarBySpecifications(requestCarDto);
     }
 
     @GetMapping("/{objectId}")
     public ResponseCarDto getCarById(@PathVariable String objectId){
         return carService.getCarById(objectId);
-    }
-
-    @GetMapping("/search")
-    public List<ResponseCarDto> findCars(@RequestBody ResponseCarDto responseCarDto){
-        return carService.getCarBySpecifications(responseCarDto);
     }
 
     @PatchMapping("/{objectId}")

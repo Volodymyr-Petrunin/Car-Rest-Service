@@ -21,25 +21,15 @@ public abstract class CarMapper {
 
     @Mapping(target = "modelName", source = "model.name")
     @Mapping(target = "makeName", source = "model.make.name")
-    public abstract ResponseCarDto carToCarDto(Car car);
-    public abstract Car carDtoToCar(ResponseCarDto responseCarDto);
-
-    @Mapping(target = "modelName", source = "model.name")
-    @Mapping(target = "makeName", source = "model.make.name")
-    public abstract RequestCarDto carToRequestCarDto(Car car);
+    public abstract ResponseCarDto carToResponseCarDto(Car car);
     public abstract Car requestCarDtoToCar(RequestCarDto requestCarDto);
-
-    @AfterMapping
-    protected void setModelInCar(@MappingTarget Car car, ResponseCarDto responseCarDto) {
-        setModel(car, responseCarDto.getModelName(), responseCarDto.getMakeName());
-    }
 
     @AfterMapping
     protected void setModelInCar(@MappingTarget Car car, RequestCarDto requestCarDto) {
         setModel(car, requestCarDto.getModelName(), requestCarDto.getMakeName());
     }
 
-    protected void setModel(Car car, String modelName, String makeName){
+    private void setModel(Car car, String modelName, String makeName) {
         Optional.ofNullable(modelName)
                 .flatMap(model -> Optional.ofNullable(makeName)
                         .map(make -> modelRepository.findByNameAndMake(modelName, makeRepository.findByName(makeName))))
