@@ -1,6 +1,7 @@
 package org.car.rest.controller;
 
-import org.car.rest.domain.dto.ModelDto;
+import org.car.rest.domain.dto.RequestModelDto;
+import org.car.rest.domain.dto.ResponseModelDto;
 import org.car.rest.service.ModelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,33 +18,27 @@ public class ModelRestController {
         this.modelService = modelService;
     }
 
-    @GetMapping("/all")
-    public List<ModelDto> allModel(){
-        return modelService.getAllModels();
+    @GetMapping("/")
+    public List<ResponseModelDto> searchModels(@RequestBody RequestModelDto requestModelDto) {
+        return modelService.getModelsByExample(requestModelDto);
     }
-
     @GetMapping("/{id}")
-    public ModelDto getModelById(@PathVariable long id){
+    public ResponseModelDto getModelById(@PathVariable long id){
         return modelService.getModelById(id);
     }
 
-    @GetMapping("/search")
-    public List<ModelDto> searchModels(@RequestBody ModelDto modelDto) {
-        return modelService.getModelsByExample(modelDto);
+    @PatchMapping("/{id}")
+    public ResponseModelDto updateModel(@PathVariable long id, @RequestBody RequestModelDto requestModelDto){
+        return modelService.updateModel(id, requestModelDto);
     }
 
-    @PatchMapping("/")
-    public ModelDto updateModel(@RequestBody ModelDto modelDto){
-        return modelService.updateModel(modelDto);
-    }
-
-    @DeleteMapping("/")
-    public void deleteModel(@RequestBody ModelDto modelDto){
-        modelService.deleteModelById(modelDto);
+    @DeleteMapping("/{id}")
+    public void deleteModel(@PathVariable long id){
+        modelService.deleteModelById(id);
     }
 
     @PostMapping("/")
-    public ModelDto createModel(@RequestBody ModelDto modelDto){
-        return modelService.createModel(modelDto);
+    public ResponseModelDto createModel(@RequestBody RequestModelDto requestModelDto){
+        return modelService.createModel(requestModelDto);
     }
 }

@@ -31,11 +31,11 @@ public class MakeService {
 
     public List<ResponseMakeDto> getAllMaker() {
         return repository.findAll(Sort.by(Sort.Direction.ASC, "id"))
-                .stream().map(makeMapper::makeToMakeDto).toList();
+                .stream().map(makeMapper::makeToResponseMakeDto).toList();
     }
 
     public ResponseMakeDto getMakerById(Long id) {
-        return makeMapper.makeToMakeDto(repository.findById(id)
+        return makeMapper.makeToResponseMakeDto(repository.findById(id)
                 .orElseThrow(() -> new MakeServiceException(Code.REQUEST_VALIDATION_ERROR,
                         "No make for with id: " + id, "Can't find make by id.", HttpStatus.BAD_REQUEST)));
     }
@@ -43,7 +43,7 @@ public class MakeService {
     public ResponseMakeDto getMakerByExample(RequestMakeDto requestMakeDto){
         Example<Make> example = Example.of(makeMapper.requestMakeDtoToMake(requestMakeDto));
 
-        return makeMapper.makeToMakeDto(repository.findOne(example)
+        return makeMapper.makeToResponseMakeDto(repository.findOne(example)
                 .orElseThrow(() -> new MakeServiceException(Code.REQUEST_VALIDATION_ERROR,
                         "Can't find make.", "Can't find make by example.", HttpStatus.BAD_REQUEST)));
     }
@@ -56,7 +56,7 @@ public class MakeService {
                     "This maker already exist: " + make.getName(), "Make already exist.", HttpStatus.CONFLICT);
         }
 
-        return makeMapper.makeToMakeDto(repository.save(make));
+        return makeMapper.makeToResponseMakeDto(repository.save(make));
     }
 
     public void createSeveralMaker(List<RequestMakeDto> makes) {
@@ -68,7 +68,7 @@ public class MakeService {
             Make make = makeMapper.requestMakeDtoToMake(requestMakeDto);
             make.setId(id);
 
-            return makeMapper.makeToMakeDto(repository.save(make));
+            return makeMapper.makeToResponseMakeDto(repository.save(make));
         } else {
             throw new MakeServiceException(Code.REQUEST_VALIDATION_ERROR,
                     "No make for update with id: " + id, "Can't find make.", HttpStatus.BAD_REQUEST);

@@ -2,12 +2,16 @@ package org.car.rest.service;
 
 import jakarta.transaction.Transactional;
 import org.car.rest.domain.Model;
-import org.car.rest.domain.dto.ModelDto;
+import org.car.rest.domain.dto.RequestModelDto;
+import org.car.rest.domain.dto.ResponseModelDto;
 import org.car.rest.domain.mapper.ModelMapper;
 import org.car.rest.repository.ModelRepository;
+import org.car.rest.service.exception.ModelServiceException;
+import org.car.rest.service.response.error.Code;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,45 +29,53 @@ public class ModelService {
         this.modelMapper = modelMapper;
     }
 
-    public List<ModelDto> getAllModels() {
+    public List<ResponseModelDto> getAllModels() {
         return repository.findAll(Sort.by(Sort.Direction.ASC, "id"))
-                .stream().map(modelMapper::modelToModelDto).toList();
+                .stream().map(modelMapper::modelToResponseModelDto).toList();
     }
 
-    public ModelDto getModelById(Long id) {
-        return modelMapper.modelToModelDto(repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Can't find model with id: " + id)));
+    public ResponseModelDto getModelById(Long id) {
+        return modelMapper.modelToResponseModelDto(repository.findById(id)
+                .orElseThrow(() -> new ModelServiceException(Code.REQUEST_VALIDATION_ERROR,
+                        "Can't find model", "Can't find model with id: " + id, HttpStatus.BAD_REQUEST)));
     }
 
-    public List<ModelDto> getModelsByExample(ModelDto modelDto){
-        Example<Model> example = Example.of(modelMapper.modelDtoToModel(modelDto));
+    public List<ResponseModelDto> getModelsByExample(RequestModelDto requestModelDto){
+        Example<Model> example = Example.of(modelMapper.requestModelDtoToModel(requestModelDto));
 
-        return repository.findAll(example).stream().map(modelMapper::modelToModelDto).toList();
+        return repository.findAll(example).stream().map(modelMapper::modelToResponseModelDto).toList();
     }
 
-    public ModelDto createModel(ModelDto modelDto) {
-        Model newModel = modelMapper.modelDtoToModel(modelDto);
+    public ResponseModelDto createModel(RequestModelDto  requestModelDto) {
+        Model newModel = modelMapper.requestModelDtoToModel(requestModelDto);
 
-        if (repository.existsByNameAndMake(newModel.getName(), newModel.getMake())){
-            throw new IllegalArgumentException("This model already exist: " + newModel);
+        modelExist(newModel);
+
+        return modelMapper.modelToResponseModelDto(repository.save(newModel));
+    }
+
+    public void createSeveralModels(List<RequestModelDto> modelsDto) {
+        repository.saveAll(modelsDto.stream().map(modelMapper::requestModelDtoToModel).toList());
+    }
+
+    public ResponseModelDto updateModel(long id, RequestModelDto requestModelDto) {
+        Model newModel = modelMapper.requestModelDtoToModel(requestModelDto);
+        newModel.setId(id);
+
+        modelExist(newModel);
+
+        return modelMapper.modelToResponseModelDto(repository.save(newModel));
+    }
+
+    public void deleteModelById(long id) {
+        repository.deleteById(id);
+    }
+
+    private void modelExist(Model model){
+        if (repository.existsByNameAndMake(model.getName(), model.getMake())){
+            throw new ModelServiceException(
+                    Code.REQUEST_VALIDATION_ERROR,
+                    "This model already exist: " + model.getName(), "Model already exist.", HttpStatus.CONFLICT);
         }
-
-        return modelMapper.modelToModelDto(repository.save(newModel));
-    }
-
-    public void createSeveralModels(List<ModelDto> modelsDto) {
-        repository.saveAll(modelsDto.stream().map(modelMapper::modelDtoToModel).toList());
-    }
-
-    public ModelDto updateModel(ModelDto modelDto) {
-        if (repository.findById(modelDto.getId()).isPresent()) {
-            return modelMapper.modelToModelDto(repository.save(modelMapper.modelDtoToModel(modelDto)));
-        } else {
-            throw new IllegalArgumentException("No model for update with id: " + modelDto.getId());
-        }
-    }
-
-    public void deleteModelById(ModelDto modelDto) {
-        repository.deleteById(modelDto.getId());
     }
 }

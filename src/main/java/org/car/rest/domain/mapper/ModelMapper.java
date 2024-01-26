@@ -1,7 +1,8 @@
 package org.car.rest.domain.mapper;
 
 import org.car.rest.domain.Model;
-import org.car.rest.domain.dto.ModelDto;
+import org.car.rest.domain.dto.ResponseModelDto;
+import org.car.rest.domain.dto.RequestModelDto;
 import org.car.rest.repository.MakeRepository;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +14,15 @@ public abstract class ModelMapper {
     private MakeRepository makeRepository;
 
     @Mapping(source = "make.name", target = "makeName")
-    public abstract ModelDto modelToModelDto(Model model);
+    public abstract ResponseModelDto modelToResponseModelDto(Model model);
 
     @Mapping(source = "makeName", target = "make.name")
-    public abstract Model modelDtoToModel(ModelDto modelDto);
+    public abstract Model requestModelDtoToModel(RequestModelDto modelDto);
 
     @AfterMapping
-    protected void setMake(@MappingTarget Model model, ModelDto modelDto) {
-        if (modelDto.getMakeName() != null) {
-            model.setMake(makeRepository.findByName(modelDto.getMakeName()));
+    protected void setMake(@MappingTarget Model model, RequestModelDto requestModelDto) {
+        if (requestModelDto.getMakeName() != null) {
+            model.setMake(makeRepository.findByName(requestModelDto.getMakeName()));
         }
     }
 }

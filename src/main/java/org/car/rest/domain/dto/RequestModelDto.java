@@ -7,8 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ModelDto {
-    private Long id;
+public class RequestModelDto {
     private String name;
     private String makeName;
 }

@@ -7,6 +7,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface MakeMapper {
-    ResponseMakeDto makeToMakeDto(Make make);
+    ResponseMakeDto makeToResponseMakeDto(Make make);
     Make requestMakeDtoToMake(RequestMakeDto requestMakeDto);
 }
