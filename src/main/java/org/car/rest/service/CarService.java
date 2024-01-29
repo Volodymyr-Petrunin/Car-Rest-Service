@@ -66,7 +66,7 @@ public class CarService {
 
         if (hasNullFields(car)) {
             throw new CarServiceException(Code.REQUEST_VALIDATION_ERROR,
-                    "Sorry but your create request is shit:)", "You can't create a Car with null values in fields.", HttpStatus.BAD_REQUEST);
+                    "Sorry but your create request is not valid.", "You can't create a Car with null values in fields.", HttpStatus.BAD_REQUEST);
         }
 
         return carMapper.carToResponseCarDto(repository.save(car));

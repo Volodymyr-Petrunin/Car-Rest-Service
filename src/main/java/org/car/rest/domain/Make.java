@@ -13,7 +13,7 @@ import java.util.Objects;
 public class Make {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "make_gen")
-    @SequenceGenerator(name = "make_gen", sequenceName = "make_seq")
+    @SequenceGenerator(name = "make_gen", sequenceName = "make_seq", allocationSize = 50, initialValue = 1)
     @Column(name = "make_id", nullable = false)
     private Long id;
     @Column(name = "make_name")

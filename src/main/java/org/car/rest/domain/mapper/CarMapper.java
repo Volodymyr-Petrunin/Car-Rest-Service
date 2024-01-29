@@ -1,6 +1,7 @@
 package org.car.rest.domain.mapper;
 
 import org.car.rest.domain.Car;
+import org.car.rest.domain.convert.YearAttributeConverter;
 import org.car.rest.domain.dto.ResponseCarDto;
 import org.car.rest.domain.dto.RequestCarDto;
 import org.car.rest.repository.MakeRepository;
@@ -8,10 +9,9 @@ import org.car.rest.repository.ModelRepository;
 import org.mapstruct.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Year;
 import java.util.Optional;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {YearAttributeConverter.class})
 public abstract class CarMapper {
 
     @Autowired
@@ -34,16 +34,5 @@ public abstract class CarMapper {
                 .flatMap(model -> Optional.ofNullable(makeName)
                         .map(make -> modelRepository.findByNameAndMake(modelName, makeRepository.findByName(makeName))))
                 .ifPresent(car::setModel);
-    }
-
-    protected short getYear(Year year) {
-        return (short) year.getValue();
-    }
-
-    protected Year setYear(short year) {
-        if (year == 0) {
-            return null;
-        }
-        return Year.of(year);
     }
 }

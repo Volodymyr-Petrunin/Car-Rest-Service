@@ -15,10 +15,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.Year;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Component
@@ -36,6 +33,7 @@ public class CarParser implements Parser<Car> {
     public Stream<Car> parse() {
         return getCsvData().stream()
                 .skip(1) // start with second element because firs is header
+                .filter(this::hasEmptyCell)
                 .map(CarParser::mapToObject);
     }
 
@@ -88,5 +86,9 @@ public class CarParser implements Parser<Car> {
         }
 
         return categories;
+    }
+
+    private boolean hasEmptyCell(String[] cells) {
+        return Arrays.stream(cells).noneMatch(cell -> cell != null && cell.trim().isEmpty());
     }
 }
