@@ -7,11 +7,14 @@ import org.car.rest.domain.Model;
 import org.car.rest.domain.dto.RequestCarDto;
 import org.car.rest.domain.dto.ResponseCarDto;
 import org.car.rest.service.CarService;
+import org.car.rest.service.exception.CarServiceException;
+import org.car.rest.service.response.error.Code;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
@@ -169,6 +172,32 @@ class CarRestControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(mapToJson(responseCarDto)));
+
+        verify(carService, times(1)).createCar(requestCarDto);
+    }
+
+    @Test
+    void testCreateCar_ShouldReturnBadRequestOnNullFields() throws Exception{
+        RequestCarDto requestCarDto = expectedRequestDto.get(0);
+        requestCarDto.setModelName(null);
+
+        CarServiceException expectedException = new CarServiceException(
+                Code.REQUEST_VALIDATION_ERROR,
+                "Sorry but your create request is not valid.",
+                "You can't create a Car with null values in fields.",
+                HttpStatus.BAD_REQUEST
+        );
+
+        when(carService.createCar(requestCarDto)).thenThrow(expectedException);
+
+        mockMvc.perform(post(requestMapping + "/")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(mapToJson(requestCarDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.error.code").value(expectedException.getCode().toString()))
+                .andExpect(jsonPath("$.error.userMessage").value(expectedException.getUserMessage()))
+                .andExpect(jsonPath("$.error.techMessage").value(expectedException.getTechMessage()));
 
         verify(carService, times(1)).createCar(requestCarDto);
     }

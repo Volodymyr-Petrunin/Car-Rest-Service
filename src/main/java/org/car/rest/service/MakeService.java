@@ -51,11 +51,6 @@ public class MakeService {
     public ResponseMakeDto createMaker(RequestMakeDto requestMakeDto) {
         Make make = makeMapper.requestMakeDtoToMake(requestMakeDto);
 
-        if (repository.existsByName(make.getName())){
-            throw new MakeServiceException(Code.REQUEST_VALIDATION_ERROR,
-                    "This maker already exist: " + make.getName(), "Make already exist.", HttpStatus.CONFLICT);
-        }
-
         return makeMapper.makeToResponseMakeDto(repository.save(make));
     }
 

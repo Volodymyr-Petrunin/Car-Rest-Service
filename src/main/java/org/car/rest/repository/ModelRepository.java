@@ -6,5 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ModelRepository extends JpaRepository<Model, Long> {
     Model findByNameAndMake(String name, Make make);
-    boolean existsByNameAndMake(String name, Make make);
 }

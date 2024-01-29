@@ -49,8 +49,6 @@ public class ModelService {
     public ResponseModelDto createModel(RequestModelDto  requestModelDto) {
         Model newModel = modelMapper.requestModelDtoToModel(requestModelDto);
 
-        modelExist(newModel);
-
         return modelMapper.modelToResponseModelDto(repository.save(newModel));
     }
 
@@ -62,20 +60,10 @@ public class ModelService {
         Model newModel = modelMapper.requestModelDtoToModel(requestModelDto);
         newModel.setId(id);
 
-        modelExist(newModel);
-
         return modelMapper.modelToResponseModelDto(repository.save(newModel));
     }
 
     public void deleteModelById(long id) {
         repository.deleteById(id);
-    }
-
-    private void modelExist(Model model){
-        if (repository.existsByNameAndMake(model.getName(), model.getMake())){
-            throw new ModelServiceException(
-                    Code.REQUEST_VALIDATION_ERROR,
-                    "This model already exist: " + model.getName(), "Model already exist.", HttpStatus.CONFLICT);
-        }
     }
 }

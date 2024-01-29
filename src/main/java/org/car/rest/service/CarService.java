@@ -64,10 +64,7 @@ public class CarService {
         Car car = carMapper.requestCarDtoToCar(requestCarDto);
         car.setObjectId(objectIdGeneration.generateRandomChars());
 
-        if (hasNullFields(car)) {
-            throw new CarServiceException(Code.REQUEST_VALIDATION_ERROR,
-                    "Sorry but your create request is not valid.", "You can't create a Car with null values in fields.", HttpStatus.BAD_REQUEST);
-        }
+        nullValidation(car);
 
         return carMapper.carToResponseCarDto(repository.save(car));
     }
@@ -85,6 +82,8 @@ public class CarService {
     public ResponseCarDto updateCar(String objectId, RequestCarDto requestCarDto){
         Car car = carMapper.requestCarDtoToCar(requestCarDto);
         car.setObjectId(objectId);
+
+        nullValidation(car);
 
         return carMapper.carToResponseCarDto(repository.save(car));
     }
@@ -127,6 +126,13 @@ public class CarService {
                 .flatMap(Optional::stream)
                 .reduce(Specification::and)
                 .orElse(Specification.where(null));
+    }
+
+    private void nullValidation(Car car){
+        if (hasNullFields(car)) {
+            throw new CarServiceException(Code.REQUEST_VALIDATION_ERROR,
+                    "Sorry but your create request is not valid.", "You can't create a Car with null values in fields.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     private boolean hasNullFields(Car car){
