@@ -32,7 +32,7 @@ public class CarParser implements Parser<Car> {
     @Override
     public Stream<Car> parse() {
         return getCsvData().stream()
-                .skip(1) // start with second element because firs is header
+                .skip(1) // start with a second element because the first is header
                 .filter(this::hasEmptyCell)
                 .map(CarParser::mapToObject);
     }
@@ -80,9 +80,10 @@ public class CarParser implements Parser<Car> {
         String[] categoriesArray = categoriesAsString.split(",");
 
         Set<Category> categories = new HashSet<>();
+        CategoryParser categoryParser = new CategoryParser();
 
         for (String label : categoriesArray){
-            categories.add(Category.valueOfLabel(label));
+            categories.add(categoryParser.valueOfLabel(label));
         }
 
         return categories;
