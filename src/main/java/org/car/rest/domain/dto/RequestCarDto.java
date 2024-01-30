@@ -13,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @EqualsAndHashCode
 public class RequestCarDto {
-    private short year;
+    private Short year;
     private String modelName;
     private String makeName;
     private Set<Category> categories;

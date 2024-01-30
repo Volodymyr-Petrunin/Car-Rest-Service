@@ -22,6 +22,7 @@ public abstract class CarMapper {
     @Mapping(target = "modelName", source = "model.name")
     @Mapping(target = "makeName", source = "model.make.name")
     public abstract ResponseCarDto carToResponseCarDto(Car car);
+    @Mapping(target = "year", source = "year", nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
     public abstract Car requestCarDtoToCar(RequestCarDto requestCarDto);
 
     @AfterMapping

@@ -13,7 +13,6 @@ import org.car.rest.repository.MakeRepository;
 import org.car.rest.repository.ModelRepository;
 import org.car.rest.service.exception.CarServiceException;
 import org.car.rest.service.response.error.Code;
-import org.car.rest.specification.CarSpecifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Transactional
@@ -53,8 +51,11 @@ public class CarService {
                 .orElseThrow(() -> new IllegalArgumentException("Can't find car with id: " + id)));
     }
 
-    public List<ResponseCarDto> getCarBySpecifications(RequestCarDto requestCarDto) {
-        Specification<Car> specification = buildQuery(requestCarDto);
+    public List<ResponseCarDto> findCars(RequestCarDto requestCarDto) {
+        Car car = carMapper.requestCarDtoToCar(requestCarDto);
+        Make make = makeRepository.findByName(requestCarDto.getMakeName());
+
+        Specification<Car> specification = repository.carBySpecifications(car, make);
 
         return repository.findAll(specification).stream()
                 .map(carMapper::carToResponseCarDto).toList();
@@ -112,20 +113,6 @@ public class CarService {
                 .collect(Collectors.toMap(Model::getName, Function.identity()));
 
         cars.forEach(car -> car.setModel(modelMap.get(car.getModel().getName())));
-    }
-
-    private Specification<Car> buildQuery(RequestCarDto requestCarDto){
-        Car car = carMapper.requestCarDtoToCar(requestCarDto);
-
-        return Stream.of(
-                        CarSpecifications.hasYear(car.getYear()),
-                        CarSpecifications.hasModel(car.getModel()),
-                        CarSpecifications.hasCategories(car.getCategories()),
-                        CarSpecifications.hasMaker(makeRepository.findByName(requestCarDto.getMakeName()))
-                )
-                .flatMap(Optional::stream)
-                .reduce(Specification::and)
-                .orElse(Specification.where(null));
     }
 
     private void nullValidation(Car car){

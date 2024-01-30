@@ -20,7 +20,7 @@ public class CarRestController {
 
     @GetMapping("/")
     public List<ResponseCarDto> findCars(@RequestBody RequestCarDto requestCarDto){
-        return carService.getCarBySpecifications(requestCarDto);
+        return carService.findCars(requestCarDto);
     }
 
     @GetMapping("/{objectId}")

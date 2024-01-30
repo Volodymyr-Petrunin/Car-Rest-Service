@@ -61,7 +61,7 @@ class CarRestControllerTest {
     @Test
     void testFindCars_ShouldReturnCorrectList_AndCallGetAllCarsMethod() throws Exception {
         RequestCarDto newDto = new RequestCarDto();
-        when(carService.getCarBySpecifications(newDto)).thenReturn(expectedResponseDto);
+        when(carService.findCars(newDto)).thenReturn(expectedResponseDto);
 
         mockMvc.perform(get(requestMapping + "/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -71,14 +71,14 @@ class CarRestControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(mapToJson(expectedResponseDto)));
 
-        verify(carService, times(1)).getCarBySpecifications(newDto);
+        verify(carService, times(1)).findCars(newDto);
     }
 
     @Test
     void testFindCars_ShouldFindCorrectCarByYear_AndCallCorrectMethods() throws Exception {
         RequestCarDto newDto = new RequestCarDto();
         newDto.setYear((short) 2020);
-        when(carService.getCarBySpecifications(newDto)).thenReturn(List.of(expectedResponseDto.get(1)));
+        when(carService.findCars(newDto)).thenReturn(List.of(expectedResponseDto.get(1)));
 
         mockMvc.perform(get(requestMapping + "/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -88,14 +88,14 @@ class CarRestControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(mapToJson(List.of(expectedResponseDto.get(1)))));
 
-        verify(carService, times(1)).getCarBySpecifications(newDto);
+        verify(carService, times(1)).findCars(newDto);
     }
 
     @Test
     void testFindCars_ShouldFindCorrectCarByCategories_AndCallCorrectMethods() throws Exception {
         RequestCarDto newDto = new RequestCarDto();
         newDto.setCategories(Set.of(Category.SPORT));
-        when(carService.getCarBySpecifications(newDto)).thenReturn(List.of(expectedResponseDto.get(2)));
+        when(carService.findCars(newDto)).thenReturn(List.of(expectedResponseDto.get(2)));
 
         mockMvc.perform(get(requestMapping + "/")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -105,7 +105,7 @@ class CarRestControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(mapToJson(List.of(expectedResponseDto.get(2)))));
 
-        verify(carService, times(1)).getCarBySpecifications(newDto);
+        verify(carService, times(1)).findCars(newDto);
     }
 
     @Test
