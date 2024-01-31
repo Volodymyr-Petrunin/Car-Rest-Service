@@ -2,8 +2,9 @@ package org.car.rest.service.cri;
 
 import org.car.rest.domain.Car;
 import org.car.rest.domain.Make;
-import org.springframework.data.jpa.domain.Specification;
+
+import java.util.List;
 
 public interface CustomCarRepository {
-    Specification<Car> carBySpecifications(Car car, Make make);
+    List<Car> carBySpecifications(Car car, Make make);
 }

@@ -55,10 +55,9 @@ public class CarService {
         Car car = carMapper.requestCarDtoToCar(requestCarDto);
         Make make = makeRepository.findByName(requestCarDto.getMakeName());
 
-        Specification<Car> specification = repository.carBySpecifications(car, make);
-
-        return repository.findAll(specification).stream()
-                .map(carMapper::carToResponseCarDto).toList();
+        return repository.carBySpecifications(car, make).stream()
+                .map(carMapper::carToResponseCarDto)
+                .toList();
     }
 
     public ResponseCarDto createCar(RequestCarDto requestCarDto) {

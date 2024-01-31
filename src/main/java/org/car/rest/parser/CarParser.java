@@ -33,7 +33,7 @@ public class CarParser implements Parser<Car> {
     public Stream<Car> parse() {
         return getCsvData().stream()
                 .skip(1) // start with a second element because the first is header
-                .filter(this::hasEmptyCell)
+                .filter(this::hasNonEmptyCell)
                 .map(CarParser::mapToObject);
     }
 
@@ -89,7 +89,7 @@ public class CarParser implements Parser<Car> {
         return categories;
     }
 
-    private boolean hasEmptyCell(String[] cells) {
-        return Arrays.stream(cells).noneMatch(cell -> cell != null && cell.trim().isEmpty());
+    private boolean hasNonEmptyCell(String[] cells) {
+        return Arrays.stream(cells).noneMatch(cell -> cell == null || cell.trim().isEmpty());
     }
 }
