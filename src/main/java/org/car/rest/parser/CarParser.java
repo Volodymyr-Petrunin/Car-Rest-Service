@@ -7,6 +7,7 @@ import org.car.rest.domain.Category;
 import org.car.rest.domain.Make;
 import org.car.rest.domain.Model;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.annotation.PropertySource;
@@ -23,10 +24,12 @@ import java.util.stream.Stream;
 @Profile("fill-data")
 public class CarParser implements Parser<Car> {
     private final String fileName;
+    private final CategoryParser categoryParser;
 
     @Autowired
-    public CarParser(@Value("${filename}") String fileName) {
+    public CarParser(@Value("${filename}") String fileName, @Qualifier("file-parser") CategoryParser categoryParser) {
         this.fileName = fileName;
+        this.categoryParser = categoryParser;
     }
 
     @Override
@@ -34,7 +37,7 @@ public class CarParser implements Parser<Car> {
         return getCsvData().stream()
                 .skip(1) // start with a second element because the first is header
                 .filter(this::hasNonEmptyCell)
-                .map(CarParser::mapToObject);
+                .map(this::mapToObject);
     }
 
     private List<String[]> getCsvData() {
@@ -56,7 +59,7 @@ public class CarParser implements Parser<Car> {
         }
     }
 
-    private static Car mapToObject(String[] data) {
+    private Car mapToObject(String[] data) {
         Car car = new Car();
         car.setObjectId(data[0]);
         car.setModel(new Model(null, data[3], new Make(null, data[1])));
@@ -72,7 +75,7 @@ public class CarParser implements Parser<Car> {
         return car;
     }
 
-    private static Set<Category> parseCategories(String categoriesAsString) {
+    private Set<Category> parseCategories(String categoriesAsString) {
         if (categoriesAsString.isEmpty()){
             return Collections.emptySet();
         }
@@ -80,10 +83,9 @@ public class CarParser implements Parser<Car> {
         String[] categoriesArray = categoriesAsString.split(",");
 
         Set<Category> categories = new HashSet<>();
-        CategoryParser categoryParser = new CategoryParser();
 
         for (String label : categoriesArray){
-            categories.add(categoryParser.valueOfLabel(label));
+            categories.add(categoryParser.parse(label));
         }
 
         return categories;
