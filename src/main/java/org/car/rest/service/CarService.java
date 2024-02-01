@@ -14,7 +14,6 @@ import org.car.rest.repository.ModelRepository;
 import org.car.rest.service.exception.CarServiceException;
 import org.car.rest.service.response.error.Code;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -52,10 +51,8 @@ public class CarService {
     }
 
     public List<ResponseCarDto> findCars(RequestCarDto requestCarDto) {
-        Car car = carMapper.requestCarDtoToCar(requestCarDto);
-        Make make = makeRepository.findByName(requestCarDto.getMakeName());
 
-        return repository.carBySpecifications(car, make).stream()
+        return repository.carsByRequestCarDto(requestCarDto).stream()
                 .map(carMapper::carToResponseCarDto)
                 .toList();
     }

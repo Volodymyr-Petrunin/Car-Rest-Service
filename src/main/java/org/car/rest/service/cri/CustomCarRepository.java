@@ -1,10 +1,10 @@
 package org.car.rest.service.cri;
 
 import org.car.rest.domain.Car;
-import org.car.rest.domain.Make;
+import org.car.rest.domain.dto.RequestCarDto;
 
 import java.util.List;
 
 public interface CustomCarRepository {
-    List<Car> carBySpecifications(Car car, Make make);
+    List<Car> carsByRequestCarDto(RequestCarDto requestCarDto);
 }
