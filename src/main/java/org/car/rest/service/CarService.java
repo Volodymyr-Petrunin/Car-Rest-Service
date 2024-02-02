@@ -51,7 +51,6 @@ public class CarService {
     }
 
     public List<ResponseCarDto> findCars(RequestCarDto requestCarDto) {
-
         return repository.carsByRequestCarDto(requestCarDto).stream()
                 .map(carMapper::carToResponseCarDto)
                 .toList();

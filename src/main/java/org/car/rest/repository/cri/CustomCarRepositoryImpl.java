@@ -1,4 +1,4 @@
-package org.car.rest.service.cri;
+package org.car.rest.repository.cri;
 
 import jakarta.persistence.EntityManager;
 import org.car.rest.domain.Car;

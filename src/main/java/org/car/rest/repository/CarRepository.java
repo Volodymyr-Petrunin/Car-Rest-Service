@@ -1,7 +1,7 @@
 package org.car.rest.repository;
 
 import org.car.rest.domain.Car;
-import org.car.rest.service.cri.CustomCarRepository;
+import org.car.rest.repository.cri.CustomCarRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

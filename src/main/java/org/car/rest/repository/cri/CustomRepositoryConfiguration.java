@@ -1,4 +1,4 @@
-package org.car.rest.service.cri;
+package org.car.rest.repository.cri;
 
 import org.car.rest.domain.Car;
 import org.springframework.context.annotation.Bean;
