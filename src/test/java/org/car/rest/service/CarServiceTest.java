@@ -1,6 +1,5 @@
 package org.car.rest.service;
 
-import jakarta.transaction.Transactional;
 import org.car.rest.domain.Category;
 import org.car.rest.domain.Make;
 import org.car.rest.domain.Model;
@@ -23,8 +22,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@DataJpaTest(excludeAutoConfiguration = ServiceTestConfiguration.class)
-@Transactional
+@DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Sql(scripts = "classpath:scripts/car-service-script.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class CarServiceTest {
