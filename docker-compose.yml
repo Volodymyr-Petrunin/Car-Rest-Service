@@ -1,6 +1,7 @@
 services:
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.6
+    container_name: keycloak
     volumes:
       - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
     environment:
@@ -9,13 +10,35 @@ services:
     ports:
       - 8180:8080
     command: -v start-dev --import-realm
+    networks:
+      - car-network
 
   postgres:
     image: postgres
-    container_name: carservice
+    container_name: postgres
     ports:
       - 5432:5432
     environment:
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: Car-Rest-Service
+    networks:
+      - car-network
 
+
+  car-rest-services:
+    image: openjdk:17-alpine
+    volumes:
+      - ./target/Car-Rest-Service-0.0.1-SNAPSHOT.jar:/app.jar
+    environment:
+#      - SPRING_PROFILES_ACTIVE=fill-data
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/Car-Rest-Service
+#      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/MyFirstKeyCloak
+    entrypoint: java -jar /app.jar
+    ports:
+      - 8080:8080
+    networks:
+      - car-network
+
+networks:
+  car-network:
+    driver: bridge
