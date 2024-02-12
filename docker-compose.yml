@@ -1,0 +1,21 @@
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.6
+    volumes:
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 8180:8080
+    command: -v start-dev --import-realm
+
+  postgres:
+    image: postgres
+    container_name: carservice
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: Car-Rest-Service
+
