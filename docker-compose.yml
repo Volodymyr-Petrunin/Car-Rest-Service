@@ -26,15 +26,15 @@ services:
 
 
   car-rest-services:
-    image: openjdk:17-alpine
-    volumes:
-      - ./target/Car-Rest-Service-0.0.1-SNAPSHOT.jar:/app.jar
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       - SPRING_PROFILES_ACTIVE=fill-data
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/Car-Rest-Service
       - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/MyFirstKeyCloak
 #     REMEMBER TO TAKE TOKEN FROM curl -X POST http://keycloak:8080/... IN DOCKER CONTAINER
-    entrypoint: java -jar /app.jar
+    entrypoint:
     ports:
       - 8080:8080
     networks:
