@@ -129,7 +129,6 @@ class CarRestControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "admin", roles = "ADMIN")
     void testUpdateCar_ShouldReturnUpdatedCar() throws Exception {
         RequestCarDto requestCarDto = expectedRequestDto.get(0);
         String objectId = "golf";
