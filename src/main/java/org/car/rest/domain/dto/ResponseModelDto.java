@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ResponseModelDto {
-    @Schema(description = "This is model id in DB.", example = "1")
+    @Schema(description = "This is unique identifier for the model.", example = "1")
     private Long id;
     @Schema(description = "This is car model name.", example = "Mark MK4")
     private String name;
