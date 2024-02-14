@@ -24,8 +24,8 @@ public class CarRestController {
     @GetMapping("/")
     @Operation(
             summary = "Retrieve information about cars",
-            description = "If searching by model, you must specify the manufacturer's name. "
-                    + "Any else feel free to do."
+            description = "When searching by model, it is necessary to specify the manufacturer's name. "
+                    + "For other queries, you are welcome to proceed."
     )
     public List<ResponseCarDto> findCars(@RequestBody RequestCarDto requestCarDto){
         return carService.findCars(requestCarDto);

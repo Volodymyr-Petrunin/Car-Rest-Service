@@ -22,7 +22,7 @@ public class RequestCarDto {
     @Schema(description = "This is car model name. If it not null you must also add makeName", example = "Supra MK4")
     private String modelName;
     @Size(min = 0, max = 255)
-    @Schema(description = "This is car maker name.", example = "Toyota")
+    @Schema(description = "This is the manufacturer's name", example = "Toyota")
     private String makeName;
     @Schema(description = "These are car categories.", example = "Convertible")
     private Set<Category> categories;
