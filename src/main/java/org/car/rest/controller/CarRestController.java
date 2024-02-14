@@ -1,5 +1,6 @@
 package org.car.rest.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.car.rest.domain.dto.RequestCarDto;
 import org.car.rest.domain.dto.ResponseCarDto;
 import org.car.rest.service.CarService;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/car")
+@SecurityRequirement(name = "bearerAuth")
 public class CarRestController {
     private final CarService carService;
 
