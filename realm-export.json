@@ -426,6 +426,34 @@
       ]
     }
   },
+  "users": [
+    {
+      "id": "admin",
+      "username": "admin",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ROLE_ADMIN"]
+    },
+    {
+      "id": "user",
+      "username": "user",
+      "enabled": true,
+      "credentials": [
+        {
+          "type": "password",
+          "value": "password",
+          "temporary": false
+        }
+      ],
+      "realmRoles": ["ROLE_USER"]
+    }
+  ],
   "groups": [],
   "defaultRole": {
     "id": "3e844c1e-3dcd-430a-bd0b-cf017444630a",

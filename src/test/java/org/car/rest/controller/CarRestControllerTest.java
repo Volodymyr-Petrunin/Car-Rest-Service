@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,8 +26,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -59,6 +61,7 @@ class CarRestControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user", roles = "USER")
     void testFindCars_ShouldReturnCorrectList_AndCallGetAllCarsMethod() throws Exception {
         RequestCarDto newDto = new RequestCarDto();
         when(carService.findCars(newDto)).thenReturn(expectedResponseDto);
@@ -75,6 +78,7 @@ class CarRestControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user", roles = "USER")
     void testFindCars_ShouldFindCorrectCarByYear_AndCallCorrectMethods() throws Exception {
         RequestCarDto newDto = new RequestCarDto();
         newDto.setYear((short) 2020);
@@ -92,6 +96,7 @@ class CarRestControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user", roles = "USER")
     void testFindCars_ShouldFindCorrectCarByCategories_AndCallCorrectMethods() throws Exception {
         RequestCarDto newDto = new RequestCarDto();
         newDto.setCategories(Set.of(Category.SPORT));
@@ -109,6 +114,7 @@ class CarRestControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user", roles = "USER")
     void testFindByObjectId_ShouldReturnCorrectObject_AndCallGetCarByIdMethod() throws Exception {
         String objectId = expectedResponseDto.get(0).getObjectId();
         when(carService.getCarById(objectId)).thenReturn(expectedResponseDto.get(0));
@@ -137,7 +143,9 @@ class CarRestControllerTest {
         mockMvc.perform(patch(requestMapping + "/" + objectId)
                         .param("objectId", objectId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapToJson(requestCarDto)))
+                        .content(mapToJson(requestCarDto))
+                            .with(csrf())
+                            .with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(mapToJson(responseCarDto)));
@@ -149,7 +157,9 @@ class CarRestControllerTest {
     void testDeleteCar_ShouldReturnNoContent() throws Exception {
         String objectId = "abc";
 
-        mockMvc.perform(delete(requestMapping  + "/" + objectId))
+        mockMvc.perform(delete(requestMapping  + "/" + objectId)
+                    .with(csrf())
+                    .with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk());
 
         verify(carService, times(1)).deleteCarById(objectId);
@@ -168,7 +178,9 @@ class CarRestControllerTest {
 
         mockMvc.perform(post(requestMapping + "/")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapToJson(requestCarDto)))
+                        .content(mapToJson(requestCarDto))
+                            .with(csrf())
+                            .with(user("admin").roles("ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(mapToJson(responseCarDto)));
@@ -192,7 +204,9 @@ class CarRestControllerTest {
 
         mockMvc.perform(post(requestMapping + "/")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapToJson(requestCarDto)))
+                    .content(mapToJson(requestCarDto))
+                        .with(csrf())
+                        .with(user("admin").roles("ADMIN")))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error.code").value(expectedException.getCode().toString()))

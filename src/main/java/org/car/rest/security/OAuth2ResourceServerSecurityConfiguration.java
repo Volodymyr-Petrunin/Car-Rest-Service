@@ -29,16 +29,16 @@ public class OAuth2ResourceServerSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.oauth2ResourceServer(resource -> resource.jwt(withDefaults()));
-
         return http.authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET).hasRole(Role.USER.toString())
                         .requestMatchers(HttpMethod.POST).hasRole(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.PUT).hasRole(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.PATCH).hasRole(Role.ADMIN.toString())
                         .requestMatchers(HttpMethod.DELETE).hasRole(Role.ADMIN.toString())
-                        .anyRequest().authenticated()
-                ).build();
+                )
+                .oauth2ResourceServer(resource -> resource.jwt(withDefaults()))
+                .build();
     }
 
     @Bean

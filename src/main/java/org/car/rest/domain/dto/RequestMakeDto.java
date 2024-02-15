@@ -1,5 +1,8 @@
 package org.car.rest.domain.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,5 +11,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class RequestMakeDto {
+    @NotBlank
+    @Size(min = 1, max = 255)
+    @Schema(description = "This is the maker name.", example = "Toyota")
     private String name;
 }

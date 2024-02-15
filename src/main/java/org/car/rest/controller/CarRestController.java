@@ -1,5 +1,7 @@
 package org.car.rest.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.car.rest.domain.dto.RequestCarDto;
 import org.car.rest.domain.dto.ResponseCarDto;
 import org.car.rest.service.CarService;
@@ -10,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/car")
+@SecurityRequirement(name = "bearerAuth")
 public class CarRestController {
     private final CarService carService;
 
@@ -19,6 +22,11 @@ public class CarRestController {
     }
 
     @GetMapping("/")
+    @Operation(
+            summary = "Retrieve information about cars",
+            description = "When searching by model, it is necessary to specify the manufacturer's name. "
+                    + "For other queries, you are welcome to proceed."
+    )
     public List<ResponseCarDto> findCars(@RequestBody RequestCarDto requestCarDto){
         return carService.findCars(requestCarDto);
     }
