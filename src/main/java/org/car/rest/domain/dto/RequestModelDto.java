@@ -16,6 +16,6 @@ public class RequestModelDto {
     @Schema(description = "This is car model name.", example = "Supra MK4")
     private String name;
     @NotBlank
-    @Schema(description = "This is the manufacturer's name", example = "Toyota")
+    @Schema(description = "This is the maker name.", example = "Toyota")
     private String makeName;
 }

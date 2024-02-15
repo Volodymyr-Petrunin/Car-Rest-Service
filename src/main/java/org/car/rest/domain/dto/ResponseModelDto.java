@@ -13,6 +13,6 @@ public class ResponseModelDto {
     private Long id;
     @Schema(description = "This is car model name.", example = "Mark MK4")
     private String name;
-    @Schema(description = "This is the manufacturer's name", example = "Toyota")
+    @Schema(description = "This is the maker name.", example = "Toyota")
     private String makeName;
 }

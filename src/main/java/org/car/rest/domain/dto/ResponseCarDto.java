@@ -23,7 +23,7 @@ public class ResponseCarDto {
     private short year;
     @Schema(description = "This is car model name.", example = "Mark MK4")
     private String modelName;
-    @Schema(description = "This is the manufacturer's name.", example = "Toyota")
+    @Schema(description = "This is the maker name.", example = "Toyota")
     private String makeName;
     @Schema(description = "These are car categories.")
     private Set<Category> categories;

@@ -13,6 +13,6 @@ import lombok.Setter;
 public class RequestMakeDto {
     @NotBlank
     @Size(min = 1, max = 255)
-    @Schema(description = "This is the manufacturer's name", example = "Toyota")
+    @Schema(description = "This is the maker name.", example = "Toyota")
     private String name;
 }
